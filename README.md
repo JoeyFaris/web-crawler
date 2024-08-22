@@ -1,0 +1,1 @@
+This is a webcrawler designed to scrape legal job boards for specific roles. Each website's `robot.txt` file was checked and verified. After link compilation, user receives an email of selected roles relating to their query.
