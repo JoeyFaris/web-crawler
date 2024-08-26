@@ -5,6 +5,7 @@ import org.quartz.impl.StdSchedulerFactory;
 
 import javax.mail.*;
 import javax.mail.internet.*;
+import java.util.List;
 import java.util.Properties;
 
 public class EmailSender {
@@ -40,7 +41,7 @@ public class EmailSender {
         }
     }
 
-    private static void sendEmail(String emailContent) {
+    public static void sendEmail(String emailContent) {
         Properties props = new Properties();
         props.put("mail.smtp.auth", "true");
         props.put("mail.smtp.starttls.enable", "true");
@@ -62,9 +63,48 @@ public class EmailSender {
 
             Transport.send(message);
 
-            System.out.println("Email sent successfully");
         } catch (MessagingException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public static void sendJobLinks(List<String> jobLinks, String recipientEmail) throws MessagingException {
+        // Mailtrap SMTP server settings
+        String host = "smtp.mailtrap.io";
+        String username = "ac96a486d67f8b";
+        String password = "816dd7406c92b4";
+        int port = 2525;
+
+        Properties props = new Properties();
+        props.put("mail.smtp.auth", "true");
+        props.put("mail.smtp.starttls.enable", "true");
+        props.put("mail.smtp.host", host);
+        props.put("mail.smtp.port", port);
+
+        Session session = Session.getInstance(props, new Authenticator() {
+            protected PasswordAuthentication getPasswordAuthentication() {
+                return new PasswordAuthentication(username, password);
+            }
+        });
+
+        // Create message
+        Message message = new MimeMessage(session);
+        message.setFrom(new InternetAddress("joeyfaris12@gmail.com"));
+        message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(recipientEmail));
+        message.setSubject("Job Links");
+
+        // Create email content
+        StringBuilder content = new StringBuilder();
+        content.append("Here are the job links:\n\n");
+        for (String link : jobLinks) {
+            content.append(link).append("\n");
+        }
+
+        message.setText(content.toString());
+
+        // Send message
+        Transport.send(message);
+
+        System.out.println("Email sent successfully to " + recipientEmail);
     }
 }
