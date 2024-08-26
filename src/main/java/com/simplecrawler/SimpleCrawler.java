@@ -2,6 +2,7 @@ package com.simplecrawler;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
+import java.net.URI;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
@@ -9,16 +10,19 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class SimpleCrawler {
+
     public void crawl(String url) {
         try {
             String content = downloadUrl(url);
             System.out.println("Downloaded: " + url);
-            
+
             List<String> links = extractLinks(content);
             System.out.println("Found " + links.size() + " links:");
             for (String link : links) {
                 System.out.println(link);
             }
+            EmailSender emailSender = new EmailSender();
+            emailSender.sendEmail("Found " + links.size() + " links on " + url);
         } catch (Exception e) {
             System.err.println("Error crawling " + url + ": " + e.getMessage());
         }
@@ -26,7 +30,8 @@ public class SimpleCrawler {
 
     private String downloadUrl(String url) throws Exception {
         StringBuilder content = new StringBuilder();
-        URL urlObject = new URL(url);
+        URI uri = new URI(url);
+        URL urlObject = uri.toURL();
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(urlObject.openStream()))) {
             String line;
             while ((line = reader.readLine()) != null) {
@@ -41,8 +46,29 @@ public class SimpleCrawler {
         Pattern pattern = Pattern.compile("href=\"(http[s]?://[^\"]+)\"");
         Matcher matcher = pattern.matcher(content);
         while (matcher.find()) {
-            links.add(matcher.group(1));
+
+            String extractedUrl = matcher.group(1);
+            try {
+                if (isValidJobLink(extractedUrl)) {
+                    links.add(extractedUrl);
+                }
+            } catch (Exception e) {
+                System.err.println("Error validating link " + extractedUrl);
+            }
+
+            //links.add(matcher.group(1));
         }
         return links;
+    }
+
+    private boolean isValidJobLink(String url) throws Exception {
+        String content = downloadUrl(url);
+        String lowerContent = content.toLowerCase();
+        return lowerContent.contains("https://open.app.jobrapido.com");
+    }
+
+    public static void main(String[] args) {
+        SimpleCrawler crawler = new SimpleCrawler();
+        crawler.crawl("https://us.jobrapido.com/Software-Engineer-jobs-in-Santa-Monica,-CA");
     }
 }
