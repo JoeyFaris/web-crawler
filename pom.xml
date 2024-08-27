@@ -23,11 +23,10 @@
             <version>2.3.1</version>
         </dependency>
 
-        <!-- Quartz Scheduler -->
         <dependency>
             <groupId>org.quartz-scheduler</groupId>
             <artifactId>quartz</artifactId>
-            <version>2.3.2</version>
+            <version>2.3.2</version> 
         </dependency>
 
         <!-- JavaMail API -->
@@ -131,6 +130,26 @@
                                 <echo>Java home: ${java.home}</echo>
                                 <echo>Java vendor: ${java.vendor}</echo>
                             </target>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-shade-plugin</artifactId>
+                <version>3.2.4</version>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>shade</goal>
+                        </goals>
+                        <configuration>
+                            <transformers>
+                                <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                                    <mainClass>com.simplecrawler.SimpleCrawler</mainClass>
+                                </transformer>
+                            </transformers>
                         </configuration>
                     </execution>
                 </executions>
