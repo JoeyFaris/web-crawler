@@ -9,9 +9,9 @@ import java.util.List;
 import java.util.Properties;
 
 public class EmailSender {
-    private static final String RECIPIENT_EMAIL = System.getenv("RECIPIENT_EMAIL");
-    private static final String SENDER_EMAIL = System.getenv("SENDER_EMAIL");
-    private static final String SENDER_PASSWORD = System.getenv("SENDER_PASSWORD");
+    public static final String RECIPIENT_EMAIL = System.getenv("RECIPIENT_EMAIL");
+    public static final String SENDER_EMAIL = System.getenv("SENDER_EMAIL");
+    public static final String SENDER_PASSWORD = System.getenv("SENDER_PASSWORD");
 
     public void scheduleEmailSending(String emailContent) throws SchedulerException {
         JobDataMap jobDataMap = new JobDataMap();
@@ -69,11 +69,11 @@ public class EmailSender {
     }
 
     public static void sendJobLinks(List<String> jobLinks, String recipientEmail) throws MessagingException {
-        // Mailtrap SMTP server settings
-        String host = "smtp.mailtrap.io";
-        String username = "ac96a486d67f8b";
-        String password = "816dd7406c92b4";
-        int port = 2525;
+
+        String host = "smtp.gmail.com";
+        String username = SENDER_EMAIL;
+        String password = SENDER_PASSWORD;
+        int port = 587;
 
         Properties props = new Properties();
         props.put("mail.smtp.auth", "true");
@@ -85,24 +85,27 @@ public class EmailSender {
             protected PasswordAuthentication getPasswordAuthentication() {
                 return new PasswordAuthentication(username, password);
             }
-        });
+        }); 
 
-        // Create message
+        System.out.println("Session " + session);
+
+        if (recipientEmail == null || recipientEmail.trim().isEmpty()) {
+            throw new IllegalArgumentException("Recipient email cannot be null or empty");
+        }
+
         Message message = new MimeMessage(session);
-        message.setFrom(new InternetAddress("joeyfaris12@gmail.com"));
+        message.setFrom(new InternetAddress(SENDER_EMAIL));
+        
         message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(recipientEmail));
-        message.setSubject("Job Links");
-
-        // Create email content
+        
         StringBuilder content = new StringBuilder();
         content.append("Here are the job links:\n\n");
         for (String link : jobLinks) {
-            content.append(link).append("\n");
+            content.append("Link: ").append(link).append("\n\n");
         }
 
         message.setText(content.toString());
 
-        // Send message
         Transport.send(message);
 
         System.out.println("Email sent successfully to " + recipientEmail);
