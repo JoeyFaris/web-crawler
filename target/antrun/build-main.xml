@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="maven-antrun-" default="main">
+  <target name="main">
+    <echo>Java version: 11</echo>
+    <echo>Java home: /usr/local/Cellar/openjdk/22.0.2/libexec/openjdk.jdk/Contents/Home</echo>
+    <echo>Java vendor: Homebrew</echo>
+  </target>
+</project>
