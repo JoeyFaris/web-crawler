@@ -42,10 +42,8 @@ public class SimpleCrawler {
                 .inTimeZone(TimeZone.getTimeZone("America/Los_Angeles")))
             .build();
 
-        // Schedule the job
         scheduler.scheduleJob(job, trigger);
 
-        // Start the scheduler
         scheduler.start();
     }
 
